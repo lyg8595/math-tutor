@@ -1,0 +1,7 @@
+streamlit
+streamlit-drawable-canvas
+pillow
+requests
+gspread
+google-auth
+pandas
