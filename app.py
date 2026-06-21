@@ -348,9 +348,19 @@ if teacher_mode:
                     counts["개념"] += 1
             st.bar_chart(pd.Series(counts))
         if "문제 요약" in sdf.columns:
-            st.write("**다룬 문제 목록**")
-            for p in sdf["문제 요약"].tolist():
-                st.markdown(f"- {p}")
+            st.write("**📚 세션별 상세 (클릭하면 대화 전체가 펼쳐져요)**")
+            for _, row in sdf.iloc[::-1].iterrows():
+                label = f"🕐 {row.get('시간','')} | {row.get('문제 요약','')} | 성취수준: {row.get('성취 수준','')}"
+                with st.expander(label):
+                    st.markdown(f"- **관련 성취기준**: {row.get('관련 성취기준','')}")
+                    st.markdown(f"- **성취 수준**: {row.get('성취 수준','')}")
+                    st.markdown(f"- **주요 취약점**: {row.get('주요 취약점','')}")
+                    st.markdown(f"- **학생 성찰**: {row.get('학생 성찰','')}")
+                    st.markdown(f"- **대화 횟수**: {row.get('대화 횟수','')}")
+                    st.markdown("**📝 생기부 초안**")
+                    st.info(row.get("생기부 초안", ""))
+                    st.markdown("**💬 전체 대화 기록**")
+                    st.text(row.get("전체 대화 기록", ""))
         st.write("---")
         if st.button("🤖 AI 종합 피드백 생성하기"):
             records_text = ""
