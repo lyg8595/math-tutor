@@ -131,7 +131,7 @@ def extract_problem(api_key, pil_img):
         "문제가 없으면 '문제 없음'이라고만 답하고, 그 외 다른 말은 붙이지 마."
     )
     payload = {
-        "model": OPENAI_MODEL,
+        "model": "gpt-4.1-mini",
         "messages": [{"role": "user", "content": [
             {"type": "text", "text": instruction},
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_str}"}},
