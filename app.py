@@ -236,6 +236,27 @@ def strip_diagnostic(text):
             return text[:idx].strip()
     return text.strip()
 
+def render_conversation(conv_text):
+    """저장된 전체 대화 기록을 화자별로 나눠 수식($)이 렌더링되도록 출력."""
+    if not conv_text:
+        st.caption("(대화 기록 없음)")
+        return
+    blocks = conv_text.split("\n\n")
+    for block in blocks:
+        block = block.strip()
+        if not block:
+            continue
+        if block.startswith("[학생]"):
+            body = block[len("[학생]"):].strip()
+            st.markdown(f"🧑‍🎓 **학생**")
+            st.markdown(body)
+        elif block.startswith("[AI 선생님]"):
+            body = block[len("[AI 선생님]"):].strip()
+            st.markdown(f"👩‍🏫 **AI 선생님**")
+            st.markdown(body)
+        else:
+            st.markdown(block)
+
 defaults = {
     "logged_in": False, "student_id": "", "student_name": "", "ban": "",
     "chat_history": [], "latest_ai_diagnostic": "", "post_save_message": None,
@@ -313,7 +334,7 @@ if teacher_mode:
                         st.markdown("**📝 생기부 초안**")
                         st.info(row.get("생기부 초안", ""))
                         st.markdown("**💬 전체 대화 기록**")
-                        st.text(row.get("전체 대화 기록", ""))
+                        render_conversation(row.get("전체 대화 기록", ""))
     else:
         if "학번" not in all_df.columns:
             st.info("학번 정보가 없습니다.")
@@ -349,7 +370,8 @@ if teacher_mode:
             st.bar_chart(pd.Series(counts))
         if "문제 요약" in sdf.columns:
             st.write("**📚 세션별 상세 (클릭하면 대화 전체가 펼쳐져요)**")
-            for _, row in sdf.iloc[::-1].iterrows():
+            sdf_sorted = sdf.sort_values("시간", ascending=False) if "시간" in sdf.columns else sdf.iloc[::-1]
+            for _, row in sdf_sorted.iterrows():
                 label = f"🕐 {row.get('시간','')} | {row.get('문제 요약','')} | 성취수준: {row.get('성취 수준','')}"
                 with st.expander(label):
                     st.markdown(f"- **관련 성취기준**: {row.get('관련 성취기준','')}")
@@ -360,7 +382,7 @@ if teacher_mode:
                     st.markdown("**📝 생기부 초안**")
                     st.info(row.get("생기부 초안", ""))
                     st.markdown("**💬 전체 대화 기록**")
-                    st.text(row.get("전체 대화 기록", ""))
+                    render_conversation(row.get("전체 대화 기록", ""))
         st.write("---")
         if st.button("🤖 AI 종합 피드백 생성하기"):
             records_text = ""
