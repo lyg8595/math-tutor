@@ -6,7 +6,10 @@ import base64
 import re
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# 한국 표준시(KST, UTC+9) — Streamlit 서버는 UTC라서 직접 변환
+KST = timezone(timedelta(hours=9))
 from PIL import Image
 import io
 import pandas as pd
@@ -485,7 +488,7 @@ def autosave():
         student_turns = sum(1 for r, _ in st.session_state["chat_history"] if r == "user")
         problem = st.session_state["extracted_problem"] if st.session_state["extracted_problem"] not in ("", "문제 없음") else (diag["problem_summary"] or "(파악 중)")
         row_values = [
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S"),
             st.session_state["student_id"],
             st.session_state["student_name"],
             problem,
