@@ -450,7 +450,13 @@ if not st.session_state["logged_in"]:
 
 if st.session_state["post_save_message"]:
     mtype, mtext = st.session_state["post_save_message"]
-    (st.success if mtype == "success" else st.error)(mtext, icon=("✅" if mtype=="success" else "❌"))
+    if mtype == "success":
+        st.balloons()
+        st.toast(mtext, icon="✅")
+        st.success(mtext, icon="✅")
+    else:
+        st.toast("저장에 실패했어. 잠시 후 다시 눌러줘.", icon="❌")
+        st.error(mtext, icon="❌")
     st.session_state["post_save_message"] = None
 
 st.write(f"📌 **{st.session_state['ban']} {st.session_state['student_id']} {st.session_state['student_name']} 학생** 접속 중")
@@ -633,9 +639,10 @@ with col3:
 
 if clicked:
     st.session_state["self_reflection"] = clicked
-    ok, err = autosave()
+    with st.spinner("✍️ 네 상태를 기록하는 중..."):
+        ok, err = autosave()
     if ok:
-        st.session_state["post_save_message"] = ("success", "성찰이 기록되었습니다! 계속 대화하거나 아래 '새 문제 시작'을 누르세요.")
+        st.session_state["post_save_message"] = ("success", f"기록 완료! '{clicked}' 상태로 저장됐어. 👍 계속 대화하거나 아래 '새 문제 시작'을 눌러줘.")
     else:
         st.session_state["post_save_message"] = ("error", f"저장 실패:\n{err}")
     st.rerun()
